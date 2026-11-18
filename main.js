@@ -5,17 +5,15 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 // 1. Сцена и Камера
 const scene = new THREE.Scene();
+// УДАЛЕНО: scene.background = new THREE.Color(0x111111); (чтобы не перекрывать градиент)
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 2, 5);
 
 // 2. Рендерер
+// ИЗМЕНЕНО: добавлено alpha: true
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
 renderer.setSize(window.innerWidth, window.innerHeight);
-
-// НОВОЕ: Устанавливаем плотность пикселей для мобильных устройств
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
-
 renderer.toneMapping = THREE.ACESFilmicToneMapping; 
 renderer.toneMappingExposure = 1.2; 
 renderer.shadowMap.enabled = true; 
@@ -26,6 +24,7 @@ document.body.appendChild(renderer.domElement);
 const pmremGenerator = new THREE.PMREMGenerator(renderer);
 pmremGenerator.compileEquirectangularShader();
 
+// ИСПРАВЛЕНО: Добавлен new URL для правильного пути на GitHub
 const hdrPath = new URL('/modern_evening_street_1k.hdr', import.meta.url).href;
 
 new RGBELoader().load(hdrPath, (texture) => {
@@ -54,6 +53,8 @@ controls.maxPolarAngle = Math.PI / 2;
 
 // 6. Загрузка модели
 const loader = new GLTFLoader();
+
+// ИСПРАВЛЕНО: Добавлен new URL и убрано %20 (пробел пишется как есть)
 const modelPath = new URL('/MK4 5.2.1.glb', import.meta.url).href;
 
 loader.load(modelPath, (gltf) => {
@@ -67,6 +68,7 @@ loader.load(modelPath, (gltf) => {
         }
     });
 
+    // Центрирование модели
     const box = new THREE.Box3().setFromObject(model);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
@@ -97,7 +99,4 @@ window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    // НОВОЕ: Обновляем плотность пикселей при повороте экрана
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
 });
