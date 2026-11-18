@@ -14,6 +14,10 @@ camera.position.set(0, 2, 5);
 // ИЗМЕНЕНО: добавлено alpha: true
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
 renderer.setSize(window.innerWidth, window.innerHeight);
+
+// НОВОЕ: Настройка плотности пикселей (для четкости на телефонах)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+
 renderer.toneMapping = THREE.ACESFilmicToneMapping; 
 renderer.toneMappingExposure = 1.2; 
 renderer.shadowMap.enabled = true; 
@@ -99,4 +103,7 @@ window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    // НОВОЕ: Обновление плотности пикселей при повороте экрана
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
 });
