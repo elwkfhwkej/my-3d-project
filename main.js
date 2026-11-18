@@ -24,12 +24,15 @@ document.body.appendChild(renderer.domElement);
 const pmremGenerator = new THREE.PMREMGenerator(renderer);
 pmremGenerator.compileEquirectangularShader();
 
-new RGBELoader().load('/modern_evening_street_1k.hdr', (texture) => {
+// ИСПРАВЛЕНО: Добавлен new URL для правильного пути на GitHub
+const hdrPath = new URL('/modern_evening_street_1k.hdr', import.meta.url).href;
+
+new RGBELoader().load(hdrPath, (texture) => {
     const envMap = pmremGenerator.fromEquirectangular(texture).texture;
     scene.environment = envMap; 
     texture.dispose();
     pmremGenerator.dispose();
-});
+}, undefined, (err) => console.error("Ошибка загрузки HDR:", err));
 
 // 4. Дополнительный свет
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); 
@@ -50,7 +53,11 @@ controls.maxPolarAngle = Math.PI / 2;
 
 // 6. Загрузка модели
 const loader = new GLTFLoader();
-loader.load('/MK4%205.2.1.glb', (gltf) => {
+
+// ИСПРАВЛЕНО: Добавлен new URL и убрано %20 (пробел пишется как есть)
+const modelPath = new URL('/MK4 5.2.1.glb', import.meta.url).href;
+
+loader.load(modelPath, (gltf) => {
     const model = gltf.scene;
     scene.add(model);
 
@@ -75,6 +82,8 @@ loader.load('/MK4%205.2.1.glb', (gltf) => {
     const maxDim = Math.max(size.x, size.y, size.z);
     camera.position.set(maxDim * 1.5, maxDim * 0.8, maxDim * 1.5);
     controls.update();
+}, undefined, (error) => {
+    console.error('ОШИБКА ЗАГРУЗКИ МОДЕЛИ:', error);
 });
 
 // 7. Анимация
